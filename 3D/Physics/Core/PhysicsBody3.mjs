@@ -23,7 +23,7 @@ var PhysicsBody3 = class {
         this.netTorque = Vector3.from(options?.netTorque);
 
         this.angularDamping = options?.angularDamping ?? 0;
-        this.linearDamping = options?.linearDamping ?? 0;
+        this.linearDamping = options?.linearDamping ?? new Vector3();
     }
 
     setPosition(position) {
@@ -66,7 +66,7 @@ var PhysicsBody3 = class {
         this.position.addInPlace(this.acceleration.scale(world.deltaTimeSquared * 0.5));
         this.position.addInPlace(this.netForce.scale(this.inverseMass));
 
-        var delta = this.position.subtract(this.previousPosition).scale(this.linearDamping);
+        var delta = this.position.subtract(this.previousPosition).multiplyInPlace(this.linearDamping);
         this.position.subtractInPlace(delta);
     }
 
@@ -121,7 +121,7 @@ var PhysicsBody3 = class {
         body.angularAcceleration = this.angularAcceleration.toJSON();
         body.netTorque = this.netTorque.toJSON();
         body.angularDamping = this.angularDamping;
-        body.linearDamping = this.linearDamping;
+        body.linearDamping = this.linearDamping.toJSON();
         return body;
     }
 
@@ -142,7 +142,7 @@ var PhysicsBody3 = class {
         body.angularAcceleration = Vector3.fromJSON(json.angularAcceleration);
         body.netTorque = Vector3.fromJSON(json.netTorque);
         body.angularDamping = json.angularDamping;
-        body.linearDamping = json.linearDamping;
+        body.linearDamping = Vector3.fromJSON(json.linearDamping);
         return body;
     }
 };

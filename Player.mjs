@@ -11,6 +11,8 @@ var Player = class extends Composite {
             options.local.body.mass = 0;
         }
         super(options);
+        this.moveStrength = options?.moveStrength ?? new Vector3(0.1,0.1,0.1);
+        this.jumpStrength = options?.jumpStrength ?? 1;
         this.spheres = [];
         this.spheres.push(new Sphere({
             radius: options?.radius ?? 1,

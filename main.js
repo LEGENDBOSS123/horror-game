@@ -118,24 +118,28 @@ var world = new World();
 world.setIterations(4);
 
 
-var jumpStrength = 0.75;
-var moveStrength = 0.05;
 var gravity = -0.2;
 var spawnPoint = new Vector3(0, 40, 0);
 
 
 var player = new Player({
     radius: 0.5,
+    moveStrength: new Vector3(0.4, 0.05, 0.4),
+    jumpStrength: 0.75,
     global: {
-        body:
-        {
+        body: {
             acceleration: new Vector3(0, gravity, 0),
             position: spawnPoint.copy(),
+            linearDamping: new Vector3(0.1, 0, 0.1)
         }
     },
-    local: { body: { mass: 1 } }
+    local: {
+        body: {
+            mass: 1
+        }
+    }
 });
-
+top.player = player;
 
 graphicsEngine.load('3D/Graphics/Textures/metal_grate_rusty_1k.gltf/metal_grate_rusty_1k.gltf', function (gltf) {
     gltf.scene.traverse(function (child) {
@@ -182,7 +186,7 @@ for (var i = 0; i < 1; i++) {
             if (child.isMesh) {
                 var box = new Box({ local: { body: { mass: Infinity } } }).fromMesh(child);
                 box.setRestitution(0);
-                box.setFriction(10);
+                box.setFriction(0);
                 box.setLocalFlag(Composite.FLAGS.STATIC, true);
 
                 box.mesh = child.clone();
@@ -275,12 +279,16 @@ function render() {
 
         if (cameraControls.movement.up && canJump) {
             var vel = player.global.body.getVelocity();
-            player.global.body.setVelocity(new Vector3(vel.x, vel.y + jumpStrength * world.deltaTime, vel.z));
+            player.global.body.setVelocity(new Vector3(vel.x, vel.y + player.jumpStrength * world.deltaTime, vel.z));
             canJump = false;
         }
-        var delta2 = cameraControls.getDelta(graphicsEngine.camera).scale(player.global.body.mass * world.deltaTime).scale(moveStrength);
+        var delta2 = cameraControls.getDelta(graphicsEngine.camera);
+        var delta3 = new Vector3(delta2.x, 0, delta2.z);
+        delta3.normalizeInPlace();
+        delta3.y = delta2.y;
+        delta3.scaleInPlace(player.global.body.mass * world.deltaTime).multiplyInPlace(player.moveStrength);
         var player_velocity = player.global.body.getVelocity();
-        player.applyForce(delta2, player.global.body.position);
+        player.applyForce(delta3, player.global.body.position);
 
 
     }
@@ -301,7 +309,7 @@ function render() {
 
 
     gameCamera.update(player.previousPosition.lerp(player.global.body.position, lerpAmount));
-    
+
     graphicsEngine.render();
     requestAnimationFrame(render);
     stats.end();
