@@ -43,6 +43,9 @@ var graphicsEngine = new GraphicsEngine({
     canvas: document.getElementById("canvas"),
 });
 
+graphicsEngine.ambientLight.intensity = 8;
+// graphicsEngine.sunlight.intensity = 0;
+
 graphicsEngine.setBackgroundImage("3D/Graphics/Textures/autumn_field_puresky_8k.hdr", true, false);
 graphicsEngine.setSunlightDirection(new Vector3(-2, -8, -5));
 top.graphicsEngine = graphicsEngine;
@@ -124,7 +127,7 @@ var spawnPoint = new Vector3(0, 40, 0);
 
 var player = new Player({
     radius: 0.5,
-    moveStrength: new Vector3(0.4, 0.05, 0.4),
+    moveStrength: new Vector3(0.4, 0.03, 0.4),
     jumpStrength: 0.75,
     global: {
         body: {
@@ -173,7 +176,7 @@ player.spheres[0].preCollisionCallback = function (contact) {
 
 
 for (var i = 0; i < 1; i++) {
-    graphicsEngine.load('untitled.glb', function (gltf) {
+    graphicsEngine.load('world.glb', function (gltf) {
         gltf.scene.castShadow = true;
         gltf.scene.receiveShadow = true;
         gltf.scene.traverse(function (child) {
