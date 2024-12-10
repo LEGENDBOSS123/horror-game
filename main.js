@@ -44,10 +44,12 @@ var graphicsEngine = new GraphicsEngine({
 });
 
 graphicsEngine.ambientLight.intensity = 8;
-// graphicsEngine.sunlight.intensity = 0;
 
 graphicsEngine.setBackgroundImage("3D/Graphics/Textures/autumn_field_puresky_8k.hdr", true, false);
+
 graphicsEngine.setSunlightDirection(new Vector3(-2, -8, -5));
+graphicsEngine.setSunlightBrightness(4);
+
 top.graphicsEngine = graphicsEngine;
 
 
@@ -133,7 +135,8 @@ var player = new Player({
         body: {
             acceleration: new Vector3(0, gravity, 0),
             position: spawnPoint.copy(),
-            linearDamping: new Vector3(0.1, 0, 0.1)
+            // linearDamping: new Vector3(0.1, 0, 0.1),
+            // angularDamping: 1
         }
     },
     local: {
@@ -161,7 +164,6 @@ graphicsEngine.load('3D/Graphics/Textures/metal_grate_rusty_1k.gltf/metal_grate_
 });
 
 
-player.addToScene(graphicsEngine.scene);
 world.addComposite(player);
 var canJump = false;
 
@@ -179,6 +181,7 @@ for (var i = 0; i < 1; i++) {
     graphicsEngine.load('world.glb', function (gltf) {
         gltf.scene.castShadow = true;
         gltf.scene.receiveShadow = true;
+
         gltf.scene.traverse(function (child) {
             child.castShadow = true;
             child.receiveShadow = true;
@@ -191,8 +194,9 @@ for (var i = 0; i < 1; i++) {
                 box.setRestitution(0);
                 box.setFriction(0);
                 box.setLocalFlag(Composite.FLAGS.STATIC, true);
-
+                box.global.body.rotation = box.global.body.rotation.rotateByAngularVelocity(new Vector3(0, 0.5));
                 box.mesh = child.clone();
+
                 world.addComposite(box);
                 if (child.name.toLowerCase().includes("checkpoint") || child.name.toLowerCase().includes("spawn")) {
                     if (child.name.toLowerCase().includes("spawn")) {
@@ -230,6 +234,16 @@ for (var i = 0; i < 1; i++) {
 var start = performance.now();
 var fps = 20;
 var steps = 0;
+
+
+top.sphereMesh = new THREE.Mesh(new THREE.SphereGeometry(0.1, 32, 32), new THREE.MeshPhongMaterial({ color: 0x00ff00, wireframe: false }));
+top.sphereMesh2 = new THREE.Mesh(new THREE.SphereGeometry(0.1, 32, 32), new THREE.MeshPhongMaterial({ color: 0xff0000, wireframe: false }));
+
+top.sphereMesh3 = new THREE.Mesh(new THREE.SphereGeometry(0.1, 32, 32), new THREE.MeshPhongMaterial({ color: 0x0000ff, wireframe: false }));
+
+graphicsEngine.addToScene(sphereMesh);
+graphicsEngine.addToScene(sphereMesh2);
+graphicsEngine.addToScene(sphereMesh3);
 
 function render() {
     stats.begin();

@@ -41,7 +41,7 @@ var Player = class extends Composite {
         this.setRestitution(0);
         this.setFriction(0);
         for(var sphere of this.spheres){
-            sphere.setRestitution(0);
+            sphere.setRestitution(1);
             sphere.setFriction(0);
         }
     }
